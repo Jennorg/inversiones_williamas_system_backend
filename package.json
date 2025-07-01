@@ -1,0 +1,41 @@
+{
+  "name": "inversiones_williamas_system_backend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" src/server.ts",
+    "build": "tsc",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.9",
+    "axios": "^1.10.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/express-serve-static-core": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.0.5",
+    "drizzle-kit": "^0.31.4",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
