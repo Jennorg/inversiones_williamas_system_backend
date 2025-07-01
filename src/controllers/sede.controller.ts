@@ -1,32 +1,32 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import axios from 'axios';
-import catchAsync from '../utils/catchAshync.js'; // Ruta sin cambios
+import catchAsync from '../utils/catchAshync.js';
 
-// Importar servicios específicos de sede
+// Importar servicios de base de datos para sedes
 import {
   getAllSedesFromDb,
   getSedeByIdFromDb,
   createSedeInDb,
   updateSedeInDb,
   deleteSedeInDb,
-} from '../services/sede.service.js'; // Ruta sin cambios
+} from '../services/sede.service.js';
 
-// Importar esquemas Zod (para validación de req.body)
+// Importar esquemas de validación Zod
 import {
   sedeCreateSchema,
   sedeUpdateSchema,
-} from '../schemas/sede.js'; // Ruta sin cambios (solo para Zod schemas)
+} from '../schemas/sede.js';
 
-import { idParamsSchema } from '../schemas/base.js'; // Ruta sin cambios
+import { idParamsSchema } from '../schemas/base.js';
 
-// Importar los tipos inferidos de Drizzle desde tu archivo de esquema de Drizzle
+// Importar tipos de Drizzle para sedes
 import {
-  Sede, // Tipo para registros seleccionados de DB
-  SedeInsert, // Tipo para insertar en DB
-} from '../config/db.js'; // <--- ¡LA CORRECCIÓN CRUCIAL AQUÍ!
+  Sede,
+  SedeInsert,
+} from '../config/db.js';
 
-// Configuración de axios
+// Cliente HTTP configurado para llamadas a APIs externas
 const apiClient = axios.create({
   timeout: 10000,
   headers: {
@@ -35,9 +35,9 @@ const apiClient = axios.create({
 });
 
 /**
- * @desc Obtener todas las sedes
+ * Obtener todas las sedes del sistema
  * @route GET /api/sedes
- * @access Public (o Private)
+ * @access Public
  */
 export const getAllSedes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const sedes: Sede[] = await getAllSedesFromDb();
@@ -51,18 +51,14 @@ export const getAllSedes = catchAsync(async (req: Request, res: Response, next: 
 });
 
 /**
- * @desc Obtener una sede por ID
+ * Obtener una sede específica por su ID
  * @route GET /api/sedes/:id
- * @access Public (o Private)
+ * @access Public
  */
 export const getSedeById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Validar y transformar el ID de los parámetros de la solicitud.
-    // 'idParamsSchema.parse(req.params)' ya convierte el ID a un número.
+    // Validar y convertir el ID de string a número
     const { id } = idParamsSchema.parse(req.params);
-
-    // Esta línea se ELIMINA porque 'id' ya es un número.
-    // const id = parseInt(stringId, 10);
 
     const sede: Sede | null = await getSedeByIdFromDb(id);
 
@@ -92,18 +88,18 @@ export const getSedeById = catchAsync(async (req: Request, res: Response, next: 
 });
 
 /**
- * @desc Crear una nueva sede
+ * Crear una nueva sede en el sistema
  * @route POST /api/sedes
  * @access Private
  */
 export const createSede = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Log del body recibido para debugging
+    // Logging detallado para debugging
     console.log('📥 Body recibido:', JSON.stringify(req.body, null, 2));
     console.log('📥 Headers:', req.headers);
     console.log('📥 Content-Type:', req.headers['content-type']);
 
-    // Validar que el body no esté vacío
+    // Validar que el body de la petición no esté vacío
     if (!req.body || Object.keys(req.body).length === 0) {
       console.log('❌ Body vacío detectado');
       return res.status(400).json({
@@ -114,7 +110,7 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
       });
     }
 
-    // Validar con Zod y capturar errores detallados
+    // Validar datos con Zod y manejar errores de validación
     let sedeDataZod;
     try {
       sedeDataZod = sedeCreateSchema.parse(req.body);
@@ -122,7 +118,7 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
     } catch (zodError: any) {
       console.log('❌ Error de validación Zod:', JSON.stringify(zodError.errors, null, 2));
       
-      // Crear respuesta detallada para el frontend
+      // Crear respuesta detallada con errores de validación
       const validationErrors = zodError.errors.map((err: any) => ({
         field: err.path.join('.'),
         message: err.message,
@@ -143,6 +139,7 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
       });
     }
 
+    // Preparar datos para inserción en base de datos
     const sedeDataDrizzle: SedeInsert = {
       name: sedeDataZod.name,
       address: sedeDataZod.address,
@@ -150,6 +147,7 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
 
     console.log('💾 Intentando crear sede en DB:', sedeDataDrizzle);
 
+    // Crear sede en la base de datos
     const newSede: Sede = await createSedeInDb(sedeDataDrizzle);
     
     console.log('✅ Sede creada exitosamente:', newSede);
@@ -176,7 +174,7 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
       });
     }
     
-    // Log del error completo para debugging
+    // Logging completo del error para debugging
     console.log('❌ Error completo:', {
       message: error.message,
       stack: error.stack,
@@ -188,24 +186,24 @@ export const createSede = catchAsync(async (req: Request, res: Response, next: N
 });
 
 /**
- * @desc Actualizar una sede existente
+ * Actualizar una sede existente
  * @route PUT /api/sedes/:id
  * @access Private
  */
 export const updateSede = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Validar y transformar el ID de los parámetros de la solicitud
+    // Validar ID de la sede
     const { id } = idParamsSchema.parse(req.params);
 
-    // Esta línea se ELIMINA.
-    // const id = parseInt(stringId, 10);
-
+    // Validar datos de actualización
     const updateDataZod = sedeUpdateSchema.parse(req.body);
 
+    // Preparar datos para actualización en base de datos
     const updateDataDrizzle: Partial<SedeInsert> = {};
     if (updateDataZod.name !== undefined) updateDataDrizzle.name = updateDataZod.name;
     if (updateDataZod.address !== undefined) updateDataDrizzle.address = updateDataZod.address;
 
+    // Actualizar sede en la base de datos
     const updatedSede: Sede | null = await updateSedeInDb(id, updateDataDrizzle);
 
     if (!updatedSede) {
@@ -235,18 +233,16 @@ export const updateSede = catchAsync(async (req: Request, res: Response, next: N
 });
 
 /**
- * @desc Eliminar una sede
+ * Eliminar una sede del sistema
  * @route DELETE /api/sedes/:id
  * @access Private
  */
 export const deleteSede = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Validar y transformar el ID de los parámetros de la solicitud
+    // Validar ID de la sede
     const { id } = idParamsSchema.parse(req.params);
 
-    // Esta línea se ELIMINA.
-    // const id = parseInt(stringId, 10);
-
+    // Eliminar sede de la base de datos
     const deletedCount = await deleteSedeInDb(id);
 
     if (deletedCount === 0) {
@@ -274,7 +270,7 @@ export const deleteSede = catchAsync(async (req: Request, res: Response, next: N
 });
 
 /**
- * @desc Obtener información de ubicación de una sede usando una API externa
+ * Obtener información de ubicación de una sede usando API externa
  * @route GET /api/sedes/:id/location
  * @access Public
  */
@@ -282,6 +278,7 @@ export const getSedeLocation = catchAsync(async (req: Request, res: Response, ne
   try {
     const { id } = idParamsSchema.parse(req.params);
     
+    // Obtener información de la sede
     const sede: Sede | null = await getSedeByIdFromDb(id);
     
     if (!sede) {
@@ -291,8 +288,7 @@ export const getSedeLocation = catchAsync(async (req: Request, res: Response, ne
       });
     }
 
-    // Usar axios para obtener información de ubicación desde una API externa
-    // Ejemplo usando la API de geocoding (puedes cambiar la URL por la que necesites)
+    // Obtener información de ubicación desde API externa
     const response = await apiClient.get(`https://api.example.com/geocode`, {
       params: {
         address: sede.address,
@@ -329,7 +325,7 @@ export const getSedeLocation = catchAsync(async (req: Request, res: Response, ne
 });
 
 /**
- * @desc Sincronizar datos de sede con un servicio externo
+ * Sincronizar datos de sede con servicio externo
  * @route POST /api/sedes/:id/sync
  * @access Private
  */
@@ -337,6 +333,7 @@ export const syncSedeWithExternalService = catchAsync(async (req: Request, res: 
   try {
     const { id } = idParamsSchema.parse(req.params);
     
+    // Obtener información de la sede
     const sede: Sede | null = await getSedeByIdFromDb(id);
     
     if (!sede) {
@@ -346,7 +343,7 @@ export const syncSedeWithExternalService = catchAsync(async (req: Request, res: 
       });
     }
 
-    // Usar axios para enviar datos a un servicio externo
+    // Sincronizar datos con servicio externo
     const syncResponse = await apiClient.post(`https://api.example.com/sync/sede`, {
       sedeId: sede.id,
       name: sede.name,
@@ -388,7 +385,7 @@ export const syncSedeWithExternalService = catchAsync(async (req: Request, res: 
 });
 
 /**
- * @desc Obtener estadísticas de sedes desde un servicio externo
+ * Obtener estadísticas de sedes desde servicio externo
  * @route GET /api/sedes/stats
  * @access Public
  */
@@ -397,7 +394,7 @@ export const getSedeStats = catchAsync(async (req: Request, res: Response, next:
     // Obtener todas las sedes locales
     const localSedes: Sede[] = await getAllSedesFromDb();
     
-    // Usar axios para obtener estadísticas desde un servicio externo
+    // Obtener estadísticas desde servicio externo
     const statsResponse = await apiClient.get(`https://api.example.com/stats/sedes`, {
       params: {
         sedeIds: localSedes.map(sede => sede.id).join(',')
@@ -425,7 +422,7 @@ export const getSedeStats = catchAsync(async (req: Request, res: Response, next:
 });
 
 /**
- * @desc Probar validación de esquema (para debugging)
+ * Validar datos de sede para debugging
  * @route POST /api/sedes/validate
  * @access Public
  */
@@ -445,13 +442,13 @@ export const validateSedeData = catchAsync(async (req: Request, res: Response, n
       });
     }
 
-    // Mostrar el esquema esperado
+    // Mostrar esquema esperado
     const expectedSchema = {
       name: 'string (required, 1-100 chars)',
       address: 'string (optional, max 255 chars)'
     };
 
-    // Validar con Zod
+    // Validar datos con Zod
     try {
       const validatedData = sedeCreateSchema.parse(req.body);
       console.log('✅ Validación exitosa:', validatedData);

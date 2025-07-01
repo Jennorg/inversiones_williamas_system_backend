@@ -1,21 +1,20 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-
-// --- Importa tu archivo central de rutas (mainRouter) ---
 import mainRouter from './routes/index.js';
 
+// Configuración principal de la aplicación Express
 const app = express();
 
-// 1. Middlewares globales
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
+// Middlewares globales para todas las rutas
+app.use(cors()); // Permite peticiones CORS desde el frontend
+app.use(express.json()); // Parsea el body de las peticiones como JSON
+app.use(morgan('dev')); // Logging de peticiones HTTP en desarrollo
 
-// 2. Montar rutas bajo el prefijo /api
+// Montar todas las rutas bajo el prefijo /api
 app.use('/api', mainRouter);
 
-// 3. Ruta para manejar 404
+// Middleware para manejar rutas no encontradas (404)
 app.all('/{*any}', (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`No se encontró la ruta: ${req.originalUrl} en este servidor!`) as any;
   error.statusCode = 404;

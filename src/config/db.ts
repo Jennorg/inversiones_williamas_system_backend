@@ -1,28 +1,23 @@
 import { InferSelectModel, InferInsertModel, relations } from 'drizzle-orm';
-import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core'; // <--- CORRECCIÓN AQUÍ: Usar sqliteTable
-
-// --- Definición de Tablas ---
-
+import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core'; 
 export const products = sqliteTable('products', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   sku: text('sku').notNull().unique(),
-  unitPrice: real('unit_price').notNull().default(0.00), // Ajustado para coincidir con la tabla existente
+  unitPrice: real('unit_price').notNull().default(0.00), 
   description: text('description'),
   category: text('category'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const sedes = sqliteTable('sedes', { // <--- CORRECCIÓN AQUÍ
+export const sedes = sqliteTable('sedes', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     address: text('address'),
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const customers = sqliteTable('customers', { // <--- CORRECCIÓN AQUÍ
+export const customers = sqliteTable('customers', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     firstName: text('first_name').notNull(),
     lastName: text('last_name').notNull(),
@@ -32,8 +27,7 @@ export const customers = sqliteTable('customers', { // <--- CORRECCIÓN AQUÍ
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const users = sqliteTable('users', { // <--- CORRECCIÓN AQUÍ
+export const users = sqliteTable('users', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     username: text('username').unique().notNull(),
     email: text('email').unique().notNull(),
@@ -43,8 +37,7 @@ export const users = sqliteTable('users', { // <--- CORRECCIÓN AQUÍ
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const authTokens = sqliteTable('auth_tokens', { // <--- CORRECCIÓN AQUÍ
+export const authTokens = sqliteTable('auth_tokens', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     userId: integer('user_id', { mode: 'number' }).notNull(),
     token: text('token').unique().notNull(),
@@ -52,8 +45,7 @@ export const authTokens = sqliteTable('auth_tokens', { // <--- CORRECCIÓN AQUÍ
     expiresAt: text('expires_at').notNull(),
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const suppliers = sqliteTable('suppliers', { // <--- CORRECCIÓN AQUÍ
+export const suppliers = sqliteTable('suppliers', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     contactPerson: text('contact_person'),
@@ -63,7 +55,6 @@ export const suppliers = sqliteTable('suppliers', { // <--- CORRECCIÓN AQUÍ
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
 export const salesOrders = sqliteTable('sales_orders', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     customerId: integer('customer_id', { mode: 'number' }).notNull(),
@@ -74,7 +65,6 @@ export const salesOrders = sqliteTable('sales_orders', {
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
 export const salesOrderItems = sqliteTable('sales_order_items', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     orderId: integer('order_id', { mode: 'number' }).notNull(),
@@ -82,7 +72,6 @@ export const salesOrderItems = sqliteTable('sales_order_items', {
     quantity: integer('quantity', { mode: 'number' }).notNull(),
     unitPriceAtSale: real('unit_price_at_sale').notNull(),
 });
-
 export const purchaseOrders = sqliteTable('purchase_orders', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     supplierId: integer('supplier_id', { mode: 'number' }).notNull(),
@@ -94,16 +83,14 @@ export const purchaseOrders = sqliteTable('purchase_orders', {
     createdAt: text('created_at').default('CURRENT_TIMESTAMP').notNull(),
     updatedAt: text('updated_at').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const purchaseOrderItems = sqliteTable('purchase_order_items', { // <--- CORRECCIÓN AQUÍ
+export const purchaseOrderItems = sqliteTable('purchase_order_items', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     orderId: integer('order_id', { mode: 'number' }).notNull(),
     productId: integer('product_id', { mode: 'number' }).notNull(),
     quantity: integer('quantity', { mode: 'number' }).notNull(),
     unitCostAtPurchase: real('unit_cost_at_purchase').notNull(),
 });
-
-export const transactionHistory = sqliteTable('transaction_history', { // <--- CORRECCIÓN AQUÍ
+export const transactionHistory = sqliteTable('transaction_history', { 
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     transactionType: text('transaction_type').notNull(),
     transactionId: integer('transaction_id', { mode: 'number' }),
@@ -112,48 +99,37 @@ export const transactionHistory = sqliteTable('transaction_history', { // <--- C
     details: text('details'),
     transactionDate: text('transaction_date').default('CURRENT_TIMESTAMP').notNull(),
 });
-
-export const sedeProductAssociations = sqliteTable('sede_product_associations', { // <--- CORRECCIÓN AQUÍ
+export const sedeProductAssociations = sqliteTable('sede_product_associations', { 
     sedeId: integer('sede_id', { mode: 'number' }).notNull(),
     productId: integer('product_id', { mode: 'number' }).notNull(),
     stockAtSede: integer('stock_at_sede', { mode: 'number' }).default(0).notNull(),
 });
-
-
-// --- Definición de Relaciones (Relations) para Drizzle ORM ---
-
 export const productsRelations = relations(products, ({ many }) => ({
   salesOrderItems: many(salesOrderItems),
   purchaseOrderItems: many(purchaseOrderItems),
   sedeProductAssociations: many(sedeProductAssociations),
 }));
-
 export const sedesRelations = relations(sedes, ({ many }) => ({
   salesOrders: many(salesOrders),
   purchaseOrders: many(purchaseOrders),
   sedeProductAssociations: many(sedeProductAssociations),
 }));
-
 export const customersRelations = relations(customers, ({ many }) => ({
   salesOrders: many(salesOrders),
 }));
-
 export const usersRelations = relations(users, ({ many }) => ({
   authTokens: many(authTokens),
   transactionHistory: many(transactionHistory),
 }));
-
 export const authTokensRelations = relations(authTokens, ({ one }) => ({
   user: one(users, {
     fields: [authTokens.userId],
     references: [users.id],
   }),
 }));
-
 export const suppliersRelations = relations(suppliers, ({ many }) => ({
   purchaseOrders: many(purchaseOrders),
 }));
-
 export const salesOrdersRelations = relations(salesOrders, ({ one, many }) => ({
   customer: one(customers, {
     fields: [salesOrders.customerId],
@@ -165,7 +141,6 @@ export const salesOrdersRelations = relations(salesOrders, ({ one, many }) => ({
   }),
   items: many(salesOrderItems),
 }));
-
 export const salesOrderItemsRelations = relations(salesOrderItems, ({ one }) => ({
   salesOrder: one(salesOrders, {
     fields: [salesOrderItems.orderId],
@@ -176,7 +151,6 @@ export const salesOrderItemsRelations = relations(salesOrderItems, ({ one }) => 
     references: [products.id],
   }),
 }));
-
 export const purchaseOrdersRelations = relations(purchaseOrders, ({ one, many }) => ({
   supplier: one(suppliers, {
     fields: [purchaseOrders.supplierId],
@@ -188,7 +162,6 @@ export const purchaseOrdersRelations = relations(purchaseOrders, ({ one, many })
   }),
   items: many(purchaseOrderItems),
 }));
-
 export const purchaseOrderItemsRelations = relations(purchaseOrderItems, ({ one }) => ({
   purchaseOrder: one(purchaseOrders, {
     fields: [purchaseOrderItems.orderId],
@@ -199,14 +172,12 @@ export const purchaseOrderItemsRelations = relations(purchaseOrderItems, ({ one 
     references: [products.id],
   }),
 }));
-
 export const transactionHistoryRelations = relations(transactionHistory, ({ one }) => ({
   user: one(users, {
     fields: [transactionHistory.userId],
     references: [users.id],
   }),
 }));
-
 export const sedeProductAssociationsRelations = relations(sedeProductAssociations, ({ one }) => ({
   sede: one(sedes, {
     fields: [sedeProductAssociations.sedeId],
@@ -217,42 +188,27 @@ export const sedeProductAssociationsRelations = relations(sedeProductAssociation
     references: [products.id],
   }),
 }));
-
-
-// --- Generación de Tipos Inferidos de Drizzle ---
-
 export type Product = InferSelectModel<typeof products>;
 export type ProductInsert = InferInsertModel<typeof products>;
-
 export type Sede = InferSelectModel<typeof sedes>;
 export type SedeInsert = InferInsertModel<typeof sedes>;
-
 export type Customer = InferSelectModel<typeof customers>;
 export type CustomerInsert = InferInsertModel<typeof customers>;
-
 export type User = InferSelectModel<typeof users>;
 export type UserInsert = InferInsertModel<typeof users>;
-
 export type AuthToken = InferSelectModel<typeof authTokens>;
 export type AuthTokenInsert = InferInsertModel<typeof authTokens>;
-
 export type Supplier = InferSelectModel<typeof suppliers>;
 export type SupplierInsert = InferInsertModel<typeof suppliers>;
-
 export type SalesOrder = InferSelectModel<typeof salesOrders>;
 export type SalesOrderInsert = InferInsertModel<typeof salesOrders>;
-
 export type SalesOrderItem = InferSelectModel<typeof salesOrderItems>;
 export type SalesOrderItemInsert = InferInsertModel<typeof salesOrderItems>;
-
 export type PurchaseOrder = InferSelectModel<typeof purchaseOrders>;
 export type PurchaseOrderInsert = InferInsertModel<typeof purchaseOrders>;
-
 export type PurchaseOrderItem = InferSelectModel<typeof purchaseOrderItems>;
 export type PurchaseOrderItemInsert = InferInsertModel<typeof purchaseOrderItems>;
-
 export type TransactionHistory = InferSelectModel<typeof transactionHistory>;
 export type TransactionHistoryInsert = InferInsertModel<typeof transactionHistory>;
-
 export type SedeProductAssociation = InferSelectModel<typeof sedeProductAssociations>;
 export type SedeProductAssociationInsert = InferInsertModel<typeof sedeProductAssociations>;

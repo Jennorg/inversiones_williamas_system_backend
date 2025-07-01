@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
 /**
- * Middleware para logging detallado de validaciones
+ * Middleware para logging detallado de todas las peticiones HTTP
+ * Registra información completa de la petición y respuesta para debugging
  */
 export const validationLogger = (req: Request, res: Response, next: NextFunction) => {
-  // Log de la petición entrante
+  // Logging de información de la petición entrante
   console.log('\n🔍 === VALIDATION LOGGER ===');
   console.log('📅 Timestamp:', new Date().toISOString());
   console.log('🌐 Method:', req.method);
@@ -32,11 +33,13 @@ export const validationLogger = (req: Request, res: Response, next: NextFunction
 };
 
 /**
- * Middleware específico para validación de body
+ * Middleware específico para validación del body de las peticiones
+ * Verifica que el body exista y no esté vacío antes de procesar la petición
  */
 export const bodyValidationLogger = (req: Request, res: Response, next: NextFunction) => {
   console.log('\n🔍 === BODY VALIDATION ===');
   
+  // Verificar que el body de la petición exista
   if (!req.body) {
     console.log('❌ No body found');
     res.status(400).json({
@@ -47,6 +50,7 @@ export const bodyValidationLogger = (req: Request, res: Response, next: NextFunc
     return;
   }
 
+  // Verificar que el body no esté vacío
   if (Object.keys(req.body).length === 0) {
     console.log('❌ Empty body object');
     res.status(400).json({

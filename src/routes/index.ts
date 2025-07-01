@@ -1,17 +1,16 @@
 import { Router } from 'express';
 
-// --- Importaciones de rutas ---
-// Asegúrate de que todas las importaciones estén al inicio del archivo
+// Importar todos los routers de la aplicación
 import customerRoutes from './customer.routes.js';
 import productRoutes from './product.routes.js';
 import purchaseOrderRoutes from './purchaseOrder.routes.js'; 
 import sedeRoutes from './sede.routes.js'
 import sedeProductAssociationRoutes from './sedesProductAssociation.routes.js';
 
+// Router principal que agrupa todas las rutas
 const router = Router();
 
-// --- Montar las rutas ---
-// El orden aquí no causa el ReferenceError, pero lógicamente va después de las importaciones
+// Montar cada router en su ruta correspondiente
 router.use('/customers', customerRoutes);
 router.use('/products', productRoutes);
 router.use('/sedes', sedeRoutes);

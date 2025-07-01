@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { timestampsSchema } from './base.js';
-
 export interface Supplier {
   id: number;
   name: string;
@@ -11,7 +10,6 @@ export interface Supplier {
   createdAt: Date;
   updatedAt: Date;
 }
-
 export const supplierCreateSchema = z.object({
   name: z.string().min(3, "El nombre del proveedor es requerido."),
   contactPerson: z.string().optional(),
@@ -19,9 +17,7 @@ export const supplierCreateSchema = z.object({
   email: z.string().email("Formato de correo electrónico inválido.").optional(),
   address: z.string().optional(),
 });
-
 export const supplierUpdateSchema = supplierCreateSchema.partial();
-
 export const supplierSchema = z.object({
   id: z.number().int().positive(),
   name: z.string(),

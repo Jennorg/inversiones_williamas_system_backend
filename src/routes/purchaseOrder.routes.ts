@@ -1,4 +1,3 @@
-// src/api/routes/purchaseOrder.routes.ts
 import { Router } from 'express';
 import {
   getAllPurchaseOrders,
@@ -6,14 +5,16 @@ import {
   createPurchaseOrder,
   updatePurchaseOrder,
   deletePurchaseOrder,
-} from '../controllers/purchaseOrder.controller.js'; // Asegúrate que esta ruta y el .js sean correctos
+} from '../controllers/purchaseOrder.controller.js';
 
-const router = Router(); // Define el router específico para órdenes de compra
+// Router específico para las rutas de órdenes de compra
+const router = Router();
 
+// Rutas CRUD para órdenes de compra
 router.get('/', getAllPurchaseOrders);
 router.get('/:id', getPurchaseOrderById);
 router.post('/', createPurchaseOrder);
 router.put('/:id', updatePurchaseOrder);
 router.delete('/:id', deletePurchaseOrder);
 
-export default router; // Exporta este router
+export default router;
